@@ -3,6 +3,8 @@ Eigenfaces main script.
 """
 
 import numpy as np
+import matplotlib
+matplotlib.use('TkAgg')
 
 from utils import show_eigenfaces
 from utils import show_nearest_neighbor
