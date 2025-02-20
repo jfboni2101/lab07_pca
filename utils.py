@@ -2,7 +2,6 @@ import numpy as np
 from typing import Tuple
 
 import matplotlib.pyplot as plt
-
 plt.ion()
 
 
@@ -46,10 +45,11 @@ def show_eigenfaces(eigenfaces: np.ndarray, size: Tuple,
             ax[i, j].imshow(f, cmap='gray')
             ax[i, j].grid(False)
             ax[i, j].axis('off')
-            ax[i, j].set_title(f"eig {j + i * w}")
+            ax[i, j].set_title(f"eig {j+i*w}")
             ax[i, j].set_aspect('equal')
 
     plt.subplots_adjust(wspace=0.05, hspace=0.4)
+    plt.waitforbuttonpress()
 
 
 def show_3d_faces_with_class(points: np.ndarray, labels: np.ndarray):
@@ -76,10 +76,11 @@ def show_3d_faces_with_class(points: np.ndarray, labels: np.ndarray):
 def show_nearest_neighbor(X_train: np.array, Y_train: np.ndarray,
                           X_test: np.array, Y_test: np.ndarray,
                           nearest_neighbors: np.array):
+
     # visualize nearest neighbors
     _, (ax0, ax1) = plt.subplots(1, 2)
 
-    while True:
+    for _ in range(5):
         # extract random index
         test_idx = np.random.randint(0, X_test.shape[0])
 
@@ -96,4 +97,3 @@ def show_nearest_neighbor(X_train: np.array, Y_train: np.ndarray,
 
         # plot faces
         plt.waitforbuttonpress()
-

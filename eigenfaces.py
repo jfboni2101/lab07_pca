@@ -46,40 +46,44 @@ class Eigenfaces:
         """
 
         # compute mean vector and store it for the inference stage
-        self._x_mean = ...
+        self._x_mean = np.mean(X, axis=0)
 
         if verbose:
             # show mean face
             plt.imshow(np.reshape(self._x_mean, newshape=(112, 92)), cmap='gray')
             plt.title('mean face')
-            plt.waitforbuttonpress()
+            plt.waitforbuttonpress(timeout=2)
             plt.close()
 
         # remove mean from the data
-        X_norm = ...
+        X_norm = X - self._x_mean
 
         # compute covariance with the eigen-trick
-        cov = ...
+        cov = X_norm @ X_norm.T
 
         # compute eigenvectors of the covariance matrix
-        eigval, eigvec = ...
+        eigval, eigvec = np.linalg.eig(cov)
 
         # sort them (decreasing order w.r.t. eigenvalues)
-        sorted_eigval, sorted_eigvec = ..., ...
+        idxs = np.argsort(eigval)[::-1]  # argsort sorts in ascending order but we want descending, so we use [::-1]
+        sorted_eigval = eigval[idxs]
+        sorted_eigvec = eigvec[:, idxs]
 
         # select principal components (vectors)
-        principal_sorted_eigval, principal_sorted_eigvec = ...
+        principal_sorted_eigval = sorted_eigval[:self.n_components]
+        principal_sorted_eigvec = sorted_eigvec[:, :self.n_components]
+
 
         # retrieve original eigenvec
-        self._ef = ...
+        self._ef = X_norm.T @ principal_sorted_eigvec
 
         # normalize the retrieved eigenvectors to have unit length
-        self._ef = ...
+        self._ef = self._ef / np.sqrt(principal_sorted_eigval)
 
         if verbose:
             # show eigenfaces
             show_eigenfaces(self._ef, (112, 92))
-            plt.waitforbuttonpress()
+            plt.waitforbuttonpress(timeout=1)
             plt.close()
 
     def transform(self, X: np.ndarray):
@@ -95,10 +99,10 @@ class Eigenfaces:
         """
 
         # project faces according to the computed directions
-        return ...
+        return (X - self._x_mean) @ self._ef
 
     def inverse_transform(self, X: np.ndarray):
-        return ...
+        return X @ self._ef.T + self._x_mean
 
 
 class NearestNeighbor:
@@ -142,7 +146,7 @@ def main():
     X_train, Y_train, X_test, Y_test = get_faces_dataset(path='att_faces', train_split=0.6)
 
     # number of principal components
-    n_components = 1
+    n_components = 6
 
     # fit the PCA transform
     eigpca = Eigenfaces(n_components)
